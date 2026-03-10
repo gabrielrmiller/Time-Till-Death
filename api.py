@@ -40,6 +40,14 @@ app = FastAPI(
     ),
 )
 
+
+@app.get("/")
+def read_root() -> dict[str, str]:
+    return {
+        "message": "Time Till Death API is running. Use POST /api/estimate for calculations."
+    }
+
+
 # Allow local frontend during development
 app.add_middleware(
     CORSMiddleware,
