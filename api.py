@@ -48,11 +48,11 @@ def read_root() -> dict[str, str]:
     }
 
 
-# Allow local frontend during development
+# Allow frontend from anywhere (localhost + Vercel); no credentials so "*" is valid
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

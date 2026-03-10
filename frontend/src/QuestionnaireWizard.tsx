@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import {
+  expectedRemainingLifeYears,
+  estimateDeathDate,
+  type Sex,
+  type HealthStatus,
+  type SmokingStatus,
+} from "./mortalityModel";
 
-export type Sex = "male" | "female" | "other";
-export type HealthStatus = "excellent" | "good" | "average" | "poor";
-export type SmokingStatus = "never" | "former" | "current";
+export type { Sex, HealthStatus, SmokingStatus };
 
 type HeightUnit = "cm" | "ft";
 type WeightUnit = "kg" | "lb";
@@ -231,7 +236,7 @@ export const QuestionnaireWizard: React.FC = () => {
     setStep((prev) => (prev > 1 ? ((prev - 1) as Step) : prev));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!validateStep(3)) {
       setStep(3);
       return;
@@ -240,51 +245,56 @@ export const QuestionnaireWizard: React.FC = () => {
     setSubmitting(true);
     setSubmitError(null);
 
-    try {
-      const birthdate = buildBirthdate();
-      const ageYears = ageFromBirthdate(birthdate);
-      if (!birthdate || ageYears === null) {
-        setErrors((prev) => ({
-          ...prev,
-          birthdate: "Please enter a valid date of birth.",
-        }));
-        setStep(1);
-        return;
-      }
+    const birthdate = buildBirthdate();
+    const ageYears = ageFromBirthdate(birthdate);
+    if (!birthdate || ageYears === null) {
+      setErrors((prev) => ({
+        ...prev,
+        birthdate: "Please enter a valid date of birth.",
+      }));
+      setStep(1);
+      setSubmitting(false);
+      return;
+    }
 
-      const payload = {
-        age: ageYears,
-        sex: form.sex,
-        height_cm: toCentimeters(),
-        weight_kg: toKilograms(),
-        health: form.health,
-        smoking: form.smoking,
-      };
+    const profile = {
+      age: ageYears,
+      sex: form.sex as Sex,
+      height_cm: toCentimeters(),
+      weight_kg: toKilograms(),
+      health: form.health as HealthStatus,
+      smoking: form.smoking as SmokingStatus,
+    };
 
-      const res = await fetch("http://localhost:8000/api/estimate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    const remainingYears = expectedRemainingLifeYears(profile);
 
-      if (!res.ok) {
-        throw new Error("Request failed");
-      }
-
-      const data: EstimateResult = await res.json();
+    if (remainingYears <= 0) {
       navigate("/result", {
         state: {
-          result: data,
-          profile: { ...payload, birthdate },
+          result: {
+            remaining_years: 0,
+            death_date: null,
+            message:
+              "According to this crude model, you've already exceeded the modeled maximum age. No remaining life expectancy is computed.",
+          },
+          profile: { ...profile, birthdate },
         },
       });
-    } catch (err) {
-      setSubmitError(
-        "Something went wrong talking to the server. Please ensure the backend is running and try again."
-      );
-    } finally {
-      setSubmitting(false);
+    } else {
+      const deathDate = estimateDeathDate(remainingYears);
+      navigate("/result", {
+        state: {
+          result: {
+            remaining_years: Math.round(remainingYears * 10) / 10,
+            death_date: deathDate,
+            message:
+              "This is a toy calculation only and not medical or actuarial advice. Do not use it for real decisions.",
+          },
+          profile: { ...profile, birthdate },
+        },
+      });
     }
+    setSubmitting(false);
   };
 
   return (
