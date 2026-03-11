@@ -7,7 +7,9 @@ export const App: React.FC = () => {
   return (
     <div className="app-root">
       <header className="app-header">
-        <div className="app-brand">Time Till Death</div>
+        <Link to="/" className="app-brand">
+          Time Till Death
+        </Link>
         <nav>
           <Link to="/">Home</Link>
         </nav>
