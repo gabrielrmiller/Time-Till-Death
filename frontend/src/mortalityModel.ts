@@ -30,9 +30,11 @@ function bmi(profile: PersonProfile): number {
 
 function baseParamsForSex(sex: Sex): MakehamParams {
   if (sex === "female") {
-    return { A: 0.00024, B: 0.0000027, c: 1.124 };
+    // Slightly lower baseline and age-related hazard for females.
+    return { A: 0.00020, B: 0.0000022, c: 1.124 };
   }
-  return { A: 0.00027, B: 0.000003, c: 1.124 };
+  // Higher baseline and age-related hazard for males to widen the gap.
+  return { A: 0.00030, B: 0.0000034, c: 1.124 };
 }
 
 function riskMultiplier(profile: PersonProfile): number {

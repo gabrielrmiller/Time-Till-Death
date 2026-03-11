@@ -131,6 +131,30 @@ export const QuestionnaireWizard: React.FC = () => {
     return years;
   };
 
+  // Base-12 style age preview: years.M where M is the month index (0–11)
+  // within the current age year (0 = just after birthday, 11 = one month before next).
+  // A would-be ".12" rolls over to the next age as ".0".
+  const agePreviewBase12 = (birthdate: string): string | null => {
+    const exactYears = ageFromBirthdate(birthdate);
+    if (exactYears === null || exactYears < 0 || exactYears > 120) return null;
+
+    const wholeYears = Math.floor(exactYears);
+    let frac = exactYears - wholeYears;
+    if (frac < 0) frac = 0;
+
+    let displayYears = wholeYears;
+    let monthIndex = Math.floor(frac * 12 + 1e-6); // 0–11 normally
+
+    if (monthIndex >= 12) {
+      // Edge case: roll over to next age at ".0"
+      displayYears += 1;
+      if (displayYears > 120) return null;
+      monthIndex = 0;
+    }
+
+    return `${displayYears}.${monthIndex}`;
+  };
+
   const currentYear = new Date().getFullYear();
 
   const buildBirthdate = (): string => {
@@ -278,6 +302,7 @@ export const QuestionnaireWizard: React.FC = () => {
   };
 
   const profile = profileForGraph();
+  const agePreviewLabel = agePreviewBase12(buildBirthdate() || "");
 
   return (
     <div className="form-section calculator-page">
@@ -290,7 +315,10 @@ export const QuestionnaireWizard: React.FC = () => {
 
       <div className="calculator-fields">
         <div className="field-group">
-          <label className="field-label">Date of birth</label>
+          <label className="field-label">
+            Date of birth
+            {agePreviewLabel ? <span className="age-inline"> (Age: {agePreviewLabel})</span> : null}
+          </label>
           <div className="unit-row">
             <select
               className="select input-small"

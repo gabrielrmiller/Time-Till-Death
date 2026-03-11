@@ -352,6 +352,12 @@ a {
   align-items: flex-end;
 }
 
+.age-inline {
+  font-size: 0.9rem;
+  color: #e5e7eb;
+  font-weight: 500;
+}
+
 .input-small {
   width: 80px;
 }
