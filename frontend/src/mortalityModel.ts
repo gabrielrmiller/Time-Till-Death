@@ -60,7 +60,7 @@ function riskMultiplier(profile: PersonProfile): number {
 
   if (profile.smoking === "never") mult *= 1.0;
   else if (profile.smoking === "former") mult *= 1.15;
-  else if (profile.smoking === "current") mult *= 1.6;
+  else if (profile.smoking === "current") mult *= 2.0;
 
   const b = bmi(profile);
   if (b <= 0) {
