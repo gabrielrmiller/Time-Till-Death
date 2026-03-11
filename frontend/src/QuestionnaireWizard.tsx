@@ -309,7 +309,7 @@ export const QuestionnaireWizard: React.FC = () => {
       <div className="step-header">
         <h2>Time Till Death Calculator</h2>
         <p className="muted">
-          Toy model only. Not medical or actuarial advice.
+          Not medical or actuarial advice.          
         </p>
       </div>
 

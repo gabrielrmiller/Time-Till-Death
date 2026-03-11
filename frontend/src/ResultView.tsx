@@ -95,7 +95,7 @@ export const ResultView: React.FC = () => {
         </>
       )}
 
-      <span className="badge-warning">Toy calculation only</span>
+      <span className="badge-warning">Not real medical or actuarial advice.</span>
 
       <p className="muted">
         This is a highly simplified numerical experiment using a Makeham-style
