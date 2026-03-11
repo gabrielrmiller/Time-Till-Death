@@ -197,6 +197,30 @@ a {
   justify-content: center;
 }
 
+.survival-chart-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #e5e7eb;
+  line-height: 1.1;
+  user-select: none;
+  pointer-events: none;
+}
+
+.chart-title-top {
+  margin-bottom: 0.15rem;
+}
+
+.chart-title-bottom {
+  margin-top: 0.15rem;
+}
+
 .survival-chart {
   width: 520px;
   display: block;

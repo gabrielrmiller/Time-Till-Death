@@ -347,7 +347,9 @@ export const QuestionnaireWizard: React.FC = () => {
             value={form.sex}
             onChange={(e) => updateField("sex", e.target.value)}
           >
-            <option value="">Select...</option>
+            <option value="" disabled hidden>
+              Sex
+            </option>
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="other">Other / prefer not to say</option>
@@ -449,7 +451,9 @@ export const QuestionnaireWizard: React.FC = () => {
             value={form.health}
             onChange={(e) => updateField("health", e.target.value)}
           >
-            <option value="">Select...</option>
+            <option value="" disabled hidden>
+              Health
+            </option>
             <option value="excellent">Excellent</option>
             <option value="good">Good</option>
             <option value="average">Average</option>
@@ -465,7 +469,9 @@ export const QuestionnaireWizard: React.FC = () => {
             value={form.smoking}
             onChange={(e) => updateField("smoking", e.target.value)}
           >
-            <option value="">Select...</option>
+            <option value="" disabled hidden>
+              Smoking
+            </option>
             <option value="never">Never smoked</option>
             <option value="former">Former smoker</option>
             <option value="current">Current smoker</option>

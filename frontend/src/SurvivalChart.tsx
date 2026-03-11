@@ -71,128 +71,126 @@ export function SurvivalChart({
       {survivalCurve.length === 0 ? (
         <p className="chart-placeholder">{placeholder}</p>
       ) : (
-    <svg
-      className="survival-chart"
-      viewBox={`0 0 ${chartW} ${chartH}`}
-      preserveAspectRatio="xMidYMid meet"
-      style={{ overflow: "visible" }}
-    >
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0%" stopColor="rgba(56, 189, 248, 0.3)" />
-          <stop offset="100%" stopColor="rgba(56, 189, 248, 0)" />
-        </linearGradient>
-      </defs>
-      {yTicks.map((s) => {
-        const y = toY(s);
-        return (
-          <line
-            key={s}
-            x1={pad.l}
-            y1={y}
-            x2={chartW - pad.r}
-            y2={y}
-            stroke="rgba(148,163,184,0.18)"
-            strokeWidth="0.5"
-          />
-        );
-      })}
-      <path
-        d={pathD + (pathD ? ` L ${toX(maxX)} ${toY(0)} L ${pad.l} ${toY(0)} Z` : "")}
-        fill={`url(#${gradId})`}
-      />
-      <path d={pathD} fill="none" stroke="#38bdf8" strokeWidth="1.5" />
-      {showHighlight && highlightX !== null && (
-        <g>
-          <line
-            x1={highlightX}
-            y1={pad.t}
-            x2={highlightX}
-            y2={chartH - pad.b}
-            stroke="#fbbf24"
-            strokeWidth="2"
-          />
-          {highlightLabel ? (
-            <text
-              x={highlightX}
-              y={pad.t - 2}
-              className="chart-ax"
-              textAnchor="middle"
-              style={{ fill: "#fbbf24" }}
-            >
-              {highlightLabel}
-            </text>
-          ) : null}
-        </g>
-      )}
-      <line
-        x1={pad.l}
-        y1={chartH - pad.b}
-        x2={chartW - pad.r}
-        y2={chartH - pad.b}
-        stroke="rgba(148,163,184,0.5)"
-        strokeWidth="0.5"
-      />
-      <line
-        x1={pad.l}
-        y1={chartH - pad.b}
-        x2={pad.l}
-        y2={pad.t}
-        stroke="rgba(148,163,184,0.5)"
-        strokeWidth="0.5"
-      />
-      {yTicks.map((s) => {
-        const y = toY(s);
-        return (
-          <g key={`ylab-${s}`}>
-            <line
-              x1={pad.l - 3}
-              y1={y}
-              x2={pad.l}
-              y2={y}
-              stroke="rgba(148,163,184,0.5)"
-              strokeWidth="0.5"
+        <div className="survival-chart-stack">
+          <div className="chart-title chart-title-top">Survival probability</div>
+          <svg
+            className="survival-chart"
+            viewBox={`0 0 ${chartW} ${chartH}`}
+            preserveAspectRatio="xMidYMid meet"
+            style={{ overflow: "visible" }}
+          >
+            <defs>
+              <linearGradient id={gradId} x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stopColor="rgba(56, 189, 248, 0.3)" />
+                <stop offset="100%" stopColor="rgba(56, 189, 248, 0)" />
+              </linearGradient>
+            </defs>
+            {yTicks.map((s) => {
+              const y = toY(s);
+              return (
+                <line
+                  key={s}
+                  x1={pad.l}
+                  y1={y}
+                  x2={chartW - pad.r}
+                  y2={y}
+                  stroke="rgba(148,163,184,0.18)"
+                  strokeWidth="0.5"
+                />
+              );
+            })}
+            <path
+              d={pathD + (pathD ? ` L ${toX(maxX)} ${toY(0)} L ${pad.l} ${toY(0)} Z` : "")}
+              fill={`url(#${gradId})`}
             />
-            <text x={pad.l - 6} y={y + 3} className="chart-ax" textAnchor="end">
-              {Math.round(s * 100)}%
-            </text>
-          </g>
-        );
-      })}
-      {ageTicks.map((age) => {
-        const t = age - ageNow;
-        const x = toX(t);
-        return (
-          <g key={age}>
+            <path d={pathD} fill="none" stroke="#38bdf8" strokeWidth="1.5" />
+            {showHighlight && highlightX !== null && (
+              <g>
+                <line
+                  x1={highlightX}
+                  y1={pad.t}
+                  x2={highlightX}
+                  y2={chartH - pad.b}
+                  stroke="#fbbf24"
+                  strokeWidth="2"
+                />
+                {highlightLabel ? (
+                  <text
+                    x={highlightX}
+                    y={pad.t - 2}
+                    className="chart-ax"
+                    textAnchor="middle"
+                    style={{ fill: "#fbbf24" }}
+                  >
+                    {highlightLabel}
+                  </text>
+                ) : null}
+              </g>
+            )}
             <line
-              x1={x}
-              y1={pad.t}
-              x2={x}
-              y2={chartH - pad.b}
-              stroke="rgba(148,163,184,0.12)"
-              strokeWidth="0.5"
-            />
-            <line
-              x1={x}
+              x1={pad.l}
               y1={chartH - pad.b}
-              x2={x}
-              y2={chartH - pad.b + 3}
+              x2={chartW - pad.r}
+              y2={chartH - pad.b}
               stroke="rgba(148,163,184,0.5)"
               strokeWidth="0.5"
             />
-            <text x={x} y={chartH - 14} className="chart-ax" textAnchor="middle">
-              {age}
-            </text>
-          </g>
-        );
-      })}
-      <text x={chartW / 2} y={8} className="chart-ax" textAnchor="middle">
-        Survival probability
-      </text>
-      <text x={chartW / 2} y={chartH - 4} className="chart-ax" textAnchor="middle">
-        Age
-      </text>
-    </svg>
+            <line
+              x1={pad.l}
+              y1={chartH - pad.b}
+              x2={pad.l}
+              y2={pad.t}
+              stroke="rgba(148,163,184,0.5)"
+              strokeWidth="0.5"
+            />
+            {yTicks.map((s) => {
+              const y = toY(s);
+              return (
+                <g key={`ylab-${s}`}>
+                  <line
+                    x1={pad.l - 3}
+                    y1={y}
+                    x2={pad.l}
+                    y2={y}
+                    stroke="rgba(148,163,184,0.5)"
+                    strokeWidth="0.5"
+                  />
+                  <text x={pad.l - 6} y={y + 3} className="chart-ax" textAnchor="end">
+                    {Math.round(s * 100)}%
+                  </text>
+                </g>
+              );
+            })}
+            {ageTicks.map((age) => {
+              const t = age - ageNow;
+              const x = toX(t);
+              return (
+                <g key={age}>
+                  <line
+                    x1={x}
+                    y1={pad.t}
+                    x2={x}
+                    y2={chartH - pad.b}
+                    stroke="rgba(148,163,184,0.12)"
+                    strokeWidth="0.5"
+                  />
+                  <line
+                    x1={x}
+                    y1={chartH - pad.b}
+                    x2={x}
+                    y2={chartH - pad.b + 3}
+                    stroke="rgba(148,163,184,0.5)"
+                    strokeWidth="0.5"
+                  />
+                  <text x={x} y={chartH - 14} className="chart-ax" textAnchor="middle">
+                    {age}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+          <div className="chart-title chart-title-bottom">Age</div>
+        </div>
       )}
     </div>
   );
