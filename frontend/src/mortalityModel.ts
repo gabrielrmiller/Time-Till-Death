@@ -38,10 +38,23 @@ function baseParamsForSex(sex: Sex): MakehamParams {
 function riskMultiplier(profile: PersonProfile): number {
   let mult = 1.0;
 
-  if (profile.health === "excellent") mult *= 0.8;
-  else if (profile.health === "good") mult *= 0.9;
-  else if (profile.health === "average") mult *= 1.0;
-  else if (profile.health === "poor") mult *= 1.3;
+  const baseHealthMult =
+    profile.health === "excellent"
+      ? 0.8
+      : profile.health === "good"
+        ? 0.9
+        : profile.health === "average"
+          ? 1.0
+          : 1.3;
+  // Progressive system: starting at age 65, increase the health effect
+  // slightly every 5 years (65–69, 70–74, ...).
+  let ageSteps = 0;
+  if (profile.age >= 65) {
+    ageSteps = Math.floor((profile.age - 65) / 5) + 1; // 65–69 => 1, 70–74 => 2, etc.
+  }
+  const healthEffectScale = 1 + 0.1 * ageSteps; // +10% effect per 5-year step
+  const healthMult = 1 + (baseHealthMult - 1) * healthEffectScale;
+  mult *= healthMult;
 
   if (profile.smoking === "never") mult *= 1.0;
   else if (profile.smoking === "former") mult *= 1.15;
