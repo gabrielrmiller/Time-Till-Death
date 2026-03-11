@@ -99,3 +99,34 @@ export function estimateDeathDate(remainingYears: number): string {
   const d = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
   return d.toISOString().slice(0, 10);
 }
+
+const MAX_AGE = 110;
+const STEP_YEARS = 0.25;
+
+/**
+ * Survival curve S(t) = P(alive at current age + t | alive at current age).
+ * Returns points for plotting: t (years from now), S (probability).
+ */
+export function getSurvivalCurve(
+  profile: PersonProfile,
+  maxYears: number = 60
+): { t: number; S: number }[] {
+  if (profile.age >= MAX_AGE) return [{ t: 0, S: 1 }, { t: maxYears, S: 0 }];
+
+  const params = baseParamsForSex(profile.sex);
+  const riskMult = riskMultiplier(profile);
+
+  const points: { t: number; S: number }[] = [{ t: 0, S: 1 }];
+  let age = profile.age;
+  let S = 1.0;
+  let t = STEP_YEARS;
+
+  while (t <= maxYears && age + t < MAX_AGE && S > 1e-6) {
+    const mu = makehamMu(age + t, params) * riskMult;
+    S *= Math.exp(-mu * STEP_YEARS);
+    points.push({ t, S });
+    t += STEP_YEARS;
+  }
+
+  return points;
+}

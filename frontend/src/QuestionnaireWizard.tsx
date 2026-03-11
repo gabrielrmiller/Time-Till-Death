@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   expectedRemainingLifeYears,
   estimateDeathDate,
+  getSurvivalCurve,
   type Sex,
   type HealthStatus,
   type SmokingStatus,
@@ -143,6 +144,32 @@ export const QuestionnaireWizard: React.FC = () => {
   const handleBirthMonthChange = (value: string) => updateField("birthMonth", value);
   const handleBirthDayChange = (value: string) => updateField("birthDay", value);
 
+  /** Build profile from form for graph; null if form incomplete or invalid. */
+  const profileForGraph = (): {
+    age: number;
+    sex: Sex;
+    height_cm: number;
+    weight_kg: number;
+    health: HealthStatus;
+    smoking: SmokingStatus;
+  } | null => {
+    const birthdate = buildBirthdate();
+    const ageYears = ageFromBirthdate(birthdate);
+    if (!birthdate || ageYears === null || ageYears < 0 || ageYears > 120) return null;
+    if (!form.sex || !form.health || !form.smoking) return null;
+    const h = toCentimeters();
+    const w = toKilograms();
+    if (h < 80 || h > 250 || w < 20 || w > 300) return null;
+    return {
+      age: ageYears,
+      sex: form.sex as Sex,
+      height_cm: h,
+      weight_kg: w,
+      health: form.health as HealthStatus,
+      smoking: form.smoking as SmokingStatus,
+    };
+  };
+
   const validateAll = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -246,16 +273,33 @@ export const QuestionnaireWizard: React.FC = () => {
     setSubmitting(false);
   };
 
-  return (
-    <div className="form-section calculator-page">
-      <div className="step-header">
-        <h2>Time Till Death Calculator</h2>
-        <p className="muted">
-          Toy model only. Not medical or actuarial advice.
-        </p>
-      </div>
+  const profile = profileForGraph();
+  const survivalCurve = profile ? getSurvivalCurve(profile) : [];
+  const chartW = 240;
+  const chartH = 140;
+  const pad = { t: 8, r: 8, b: 24, l: 36 };
+  const maxY = 1;
+  const maxX = Math.max(1, ...survivalCurve.map((p) => p.t));
+  const toX = (t: number) => pad.l + (t / maxX) * (chartW - pad.l - pad.r);
+  const toY = (S: number) => chartH - pad.b - (S / maxY) * (chartH - pad.t - pad.b);
+  const pathD =
+    survivalCurve.length > 0
+      ? survivalCurve
+          .map((p, i) => `${i === 0 ? "M" : "L"} ${toX(p.t)} ${toY(p.S)}`)
+          .join(" ")
+      : "";
 
-      <div className="calculator-fields">
+  return (
+    <div className="calculator-layout">
+      <div className="form-section calculator-page">
+        <div className="step-header">
+          <h2>Time Till Death Calculator</h2>
+          <p className="muted">
+            Toy model only. Not medical or actuarial advice.
+          </p>
+        </div>
+
+        <div className="calculator-fields">
         <div className="field-group">
           <label className="field-label">Date of birth</label>
           <div className="unit-row">
@@ -435,15 +479,55 @@ export const QuestionnaireWizard: React.FC = () => {
         </div>
       </div>
 
-      <div className="calculator-actions">
-        <button
-          className="primary-btn"
-          onClick={handleSubmit}
-          disabled={submitting}
-        >
-          {submitting ? "Calculating..." : "Calculate"}
-        </button>
+        <div className="calculator-actions">
+          <button
+            className="primary-btn"
+            onClick={handleSubmit}
+            disabled={submitting}
+          >
+            {submitting ? "Calculating..." : "Calculate"}
+          </button>
+        </div>
       </div>
+
+      <aside className="calculator-sidebar">
+        <div className="sidebar-equation">
+          <div className="sidebar-label">Model</div>
+          <div className="equation">μ(x) = A + B · c<sup>x</sup></div>
+          <p className="equation-note">
+            Force of mortality at age <em>x</em>. A, B, c depend on sex; multiplied by a risk factor from health, smoking, and BMI.
+          </p>
+        </div>
+        <div className="sidebar-chart">
+          <div className="sidebar-label">Survival curve</div>
+          {survivalCurve.length > 0 ? (
+            <svg
+              className="survival-chart"
+              viewBox={`0 0 ${chartW} ${chartH}`}
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <defs>
+                <linearGradient id="survGrad" x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stopColor="rgba(56, 189, 248, 0.3)" />
+                  <stop offset="100%" stopColor="rgba(56, 189, 248, 0)" />
+                </linearGradient>
+              </defs>
+              <path
+                d={pathD + (pathD ? ` L ${toX(maxX)} ${toY(0)} L ${pad.l} ${toY(0)} Z` : "")}
+                fill="url(#survGrad)"
+              />
+              <path d={pathD} fill="none" stroke="#38bdf8" strokeWidth="1.5" />
+              <line x1={pad.l} y1={chartH - pad.b} x2={chartW - pad.r} y2={chartH - pad.b} stroke="rgba(148,163,184,0.5)" strokeWidth="0.5" />
+              <line x1={pad.l} y1={chartH - pad.b} x2={pad.l} y2={pad.t} stroke="rgba(148,163,184,0.5)" strokeWidth="0.5" />
+              <text x={pad.l - 4} y={pad.t + 4} className="chart-ax" textAnchor="end">1</text>
+              <text x={pad.l - 4} y={chartH - pad.b + 4} className="chart-ax" textAnchor="end">0</text>
+              <text x={chartW / 2} y={chartH - 4} className="chart-ax" textAnchor="middle">Years from now</text>
+            </svg>
+          ) : (
+            <p className="chart-placeholder">Fill in the form to see your survival curve.</p>
+          )}
+        </div>
+      </aside>
     </div>
   );
 };

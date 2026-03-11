@@ -129,6 +129,83 @@ a {
   margin-top: 0.5rem;
 }
 
+.calculator-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  flex: 1;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .calculator-layout {
+    grid-template-columns: 1fr 280px;
+  }
+}
+
+.calculator-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebar-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  margin-bottom: 0.35rem;
+}
+
+.sidebar-equation {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.equation {
+  font-family: ui-monospace, monospace;
+  font-size: 1rem;
+  color: #e5e7eb;
+  margin: 0 0 0.5rem;
+}
+
+.equation-note {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.sidebar-chart {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.survival-chart {
+  width: 100%;
+  height: auto;
+  max-height: 180px;
+}
+
+.survival-chart .chart-ax {
+  font-size: 10px;
+  fill: #9ca3af;
+}
+
+.chart-placeholder {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .step-header {
   margin-bottom: 1rem;
 }
