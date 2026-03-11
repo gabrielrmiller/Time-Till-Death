@@ -113,6 +113,22 @@ a {
   flex: 1;
 }
 
+.calculator-page .calculator-fields {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 560px) {
+  .calculator-page .calculator-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.calculator-page .calculator-actions {
+  margin-top: 0.5rem;
+}
+
 .step-header {
   margin-bottom: 1rem;
 }
